@@ -22,33 +22,60 @@ def extract_audio(video_path, output_audio_path):
     audio_clip.write_audiofile(output_audio_path)
     audio_clip.close()
     video_clip.close()
+    print(f"Audio extracted and saved to {output_audio_path}")
 
 def transcribe_audio(audio_path):
     """Transcribe the audio to text."""
     recognizer = sr.Recognizer()
+
     with sr.AudioFile(audio_path) as source:
         audio_data = recognizer.record(source)
+    
     try:
-        return recognizer.recognize_google(audio_data)
+        text = recognizer.recognize_google(audio_data)
+        return text
     except sr.UnknownValueError:
         return "Google Speech Recognition could not understand the audio"
     except sr.RequestError as e:
-        return f"Could not request results; {e}"
+        return f"Could not request results from Google Speech Recognition service; {e}"
+
+
 
 def get_ai_response(user_message):
-    """Classify text and provide an educational rating."""
-    prompt = f"""
-    Determine if the following text is educational and provide a rating from 1 to 10 if it is educational.
-    Otherwise, classify as "Non-Educational".
-    Text: {user_message}
-    """
-    response = model.generate_content(prompt)
-    output = response.text.strip().lower()
-    if "non-educational" in output:
-        return "Non-Educational", "N/A"
-    else:
-        rating = [word for word in output.split() if word.isdigit()]
-        return "Educational", rating[0] if rating else "N/A"
+    """Get AI response to classify the text and assign a rating."""
+    try:
+        prompt = (
+            f"Determine if the following text is educational. If educational, provide a rating from 1 to 10, "
+            f"where 10 is highly educational. Otherwise, classify as 'Non-Educational'.\n\n"
+            f"Text: {user_message}\n"
+            f"Output: 'Educational' with a rating, or 'Non-Educational'."
+        )
+        response = model.generate_content(prompt)
+        
+        if response.text:
+            output = response.text.strip().lower()
+            
+            if "non-educational" in output:
+                return "Non-Educational", "N/A"
+            else:
+                # Extract rating if present
+                rating = extract_rating_from_response(output)
+                return "Educational", rating
+        else:
+            return 'Sorry, I could not understand that.', "N/A"
+    
+    except Exception as e:
+        print(f"Error: {e}")
+        return 'Error: Could not generate a response.', "N/A"
+
+def extract_rating_from_response(response_text):
+    """Extract the rating number from the AI response."""
+    words = response_text.split()
+    for word in words:
+        if word.isdigit():
+            return word  # Return the first number found as the rating
+    return "N/A"  # Default if no rating found
+
 
 @app.route('/classify', methods=['POST'])
 def classify_video():
