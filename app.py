@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, render_template_string
 import google.generativeai as genai
 import speech_recognition as sr
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 app = Flask(__name__)
 
