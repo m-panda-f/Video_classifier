@@ -11,7 +11,7 @@ AUDIO_OUTPUT_PATH = 'output/audio.wav'
 os.makedirs('output', exist_ok=True)
 
 # Replace with your actual API key
-API_KEY = 'YOUR_API_KEY'
+API_KEY = os.getenv('api_key') 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -70,4 +70,4 @@ def classify_video():
     }
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
