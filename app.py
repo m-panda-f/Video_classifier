@@ -27,7 +27,7 @@ def transcribe_audio(audio_path):
     try:
         with sr.AudioFile(audio_path) as source:
             audio_data = recognizer.record(source)
-            text = recognizer.recognize_google(audio_data,timeout=10)
+            text = recognizer.recognize_google(audio_data)
             return text
     except sr.UnknownValueError:
         return "Google Speech Recognition could not understand the audio"
