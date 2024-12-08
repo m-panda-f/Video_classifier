@@ -50,9 +50,9 @@ def transcribe_video():
     # Extract audio and transcribe
     extract_audio(video_path, AUDIO_OUTPUT_PATH)
     transcription = transcribe_audio(AUDIO_OUTPUT_PATH)
-    print(f"Transcription: {transcription}")
+    
 
-    return jsonify({'transcription': transcription})
+    return jsonify({'transcription': transcription}), print(f"Transcription: {transcription}")
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
