@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 import speech_recognition as sr
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 app = Flask(__name__)
 
