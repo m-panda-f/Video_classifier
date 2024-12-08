@@ -1,12 +1,13 @@
 import os
 from flask import Flask, request, jsonify
 import speech_recognition as sr
-from moviepy import VideoFileClip
+from moviepy.editor import VideoFileClip
 
 app = Flask(__name__)
 
 # Define file paths
 AUDIO_OUTPUT_PATH = 'output/audio.wav'
+os.makedirs('output', exist_ok=True)
 
 def extract_audio(video_path, output_audio_path):
     """Extract audio from the video."""
@@ -32,6 +33,9 @@ def transcribe_audio(audio_path):
         return "Google Speech Recognition could not understand the audio"
     except sr.RequestError as e:
         return f"Could not request results from Google Speech Recognition service; {e}"
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
+
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe_video():
@@ -43,12 +47,11 @@ def transcribe_video():
     os.makedirs('uploads', exist_ok=True)
     video.save(video_path)
 
+    # Extract audio and transcribe
     extract_audio(video_path, AUDIO_OUTPUT_PATH)
     transcription = transcribe_audio(AUDIO_OUTPUT_PATH)
 
-    return jsonify({
-        'transcription': transcription
-    })
+    return jsonify({'transcription': transcription})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
