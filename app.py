@@ -50,6 +50,7 @@ def transcribe_video():
     # Extract audio and transcribe
     extract_audio(video_path, AUDIO_OUTPUT_PATH)
     transcription = transcribe_audio(AUDIO_OUTPUT_PATH)
+    print(f"Transcription: {transcription}")
 
     return jsonify({'transcription': transcription})
 
